@@ -1,19 +1,25 @@
-﻿using LabProject.Application.Interfaces;
+﻿using AutoMapper;
+using LabProject.Application.DTOs.Category;
+using LabProject.Application.Interfaces;
 using LabProject.Application.Services;
 using LabProject.Domain.Interfaces;
 using LabProject.Infrastructure.Data;
 using LabProject.Infrastructure.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
 namespace LabProject.WebApi.Extentions
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<FileContext>();
-            services.AddScoped<ICategoryRepository, FileCategoryRepository>();
-            services.AddScoped<IProductRepository, FileProductRepository>();
-
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
             return services;
         }
 
@@ -21,7 +27,7 @@ namespace LabProject.WebApi.Extentions
         {
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
-
+            services.AddAutoMapper(cfg => cfg.AddMaps(typeof(UpdateCategoryDto).Assembly));
             return services;
         }
     }
