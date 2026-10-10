@@ -1,89 +1,88 @@
-﻿using LabProject.Application.Interfaces;
-using LabProject.Domain.Models;
+﻿using LabProject.Application.DTOs.Category;
+using LabProject.Application.DTOs.Product;
+using LabProject.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LabProject.WebApi.Controllers
+namespace LabProject.WebApi.Controllers;
+
+[ApiController]
+[Route("api/categories")]
+public class CategoriesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/categories")]
-    public class CategoriesController : ControllerBase
+    private readonly ICategoryService _categoryService;
+
+    public CategoriesController(ICategoryService categoryService)
     {
-        private readonly ICategoryService _categoryService;
+        _categoryService = categoryService;
+    }
 
-        public CategoriesController(ICategoryService categoryService)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<CategoryResponseDto>>> GetAll()
+    {
+        var categories = await _categoryService.GetAllCategoriesAsync();
+        return Ok(categories);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<CategoryResponseDto>> GetById(Guid id)
+    {
+        var category = await _categoryService.GetCategoryByIdAsync(id);
+        if (category is null)
         {
-            _categoryService = categoryService;
+            return NotFound($"Category with id '{id}' was not found.");
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAll()
+        return Ok(category);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<CategoryResponseDto>> Create([FromBody] CreateCategoryDto dto)
+    {
+        var created = await _categoryService.CreateCategoryAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCategoryDto dto)
+    {
+        var updated = await _categoryService.UpdateCategoryAsync(id, dto);
+        if (!updated)
         {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-            return Ok(categories);
+            return NotFound($"Category with id '{id}' was not found.");
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Category>> GetById(Guid id)
-        {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-            if (category is null)
-            {
-                return NotFound($"Category with id '{id}' was not found.");
-            }
+        return NoContent();
+    }
 
-            return Ok(category);
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAll()
+    {
+        await _categoryService.DeleteAllCategoriesAsync();
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await _categoryService.DeleteCategoryAsync(id);
+        if (!deleted)
+        {
+            return NotFound($"Category with id '{id}' was not found.");
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Category>> Create([FromBody] Category category)
+        return NoContent();
+    }
+
+    [HttpGet("{id:guid}/products")]
+    public async Task<ActionResult<IEnumerable<ProductResponseDto>>> GetProducts(Guid id)
+    {
+        var category = await _categoryService.GetCategoryByIdAsync(id);
+        if (category is null)
         {
-            var created = await _categoryService.CreateCategoryAsync(category);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return NotFound($"Category with id '{id}' was not found.");
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] Category category)
-        {
-            category.Id = id;
-            var updated = await _categoryService.UpdateCategoryAsync(category);
-            if (!updated)
-            {
-                return NotFound($"Category with id '{id}' was not found.");
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAll()
-        {
-            await _categoryService.DeleteAllCategoriesAsync();
-            return NoContent();
-        }
-
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            var deleted = await _categoryService.DeleteCategoryAsync(id);
-            if (!deleted)
-            {
-                return NotFound($"Category with id '{id}' was not found.");
-            }
-
-            return NoContent();
-        }
-
-        [HttpGet("{id:guid}/products")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(Guid id)
-        {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-            if (category is null)
-            {
-                return NotFound($"Category with id '{id}' was not found.");
-            }
-
-            var products = await _categoryService.GetProductsByCategoryIdAsync(id);
-            return Ok(products);
-        }
+        var products = await _categoryService.GetProductsByCategoryIdAsync(id);
+        return Ok(products);
     }
 }

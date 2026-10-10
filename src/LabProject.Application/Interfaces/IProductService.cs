@@ -1,13 +1,14 @@
-﻿using LabProject.Domain.Models;
+﻿using LabProject.Application.DTOs.Product;
+using LabProject.Domain.Models;
 
 namespace LabProject.Application.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetAllProductsAsync();
-        Task<Product?> GetProductByIdAsync(Guid id);
-        Task<Product> CreateProductAsync(Product product);
-        Task<bool> UpdateProductAsync(Product product);
+        Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync();
+        Task<ProductResponseDto?> GetProductByIdAsync(Guid id);
+        Task<ProductResponseDto> CreateProductAsync(CreateProductDto dto);
+        Task<bool> UpdateProductAsync(Guid id, UpdateProductDto dto);
         Task<bool> DeleteProductAsync(Guid id);
         Task DeleteAllProductsAsync();
     }

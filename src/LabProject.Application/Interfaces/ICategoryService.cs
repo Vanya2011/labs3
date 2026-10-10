@@ -1,16 +1,18 @@
 ﻿
+using LabProject.Application.DTOs.Category;
+using LabProject.Application.DTOs.Product;
 using LabProject.Domain.Models;
 
 namespace LabProject.Application.Interfaces
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<Category>> GetAllCategoriesAsync();
-        Task<Category?> GetCategoryByIdAsync(Guid id);
-        Task<Category> CreateCategoryAsync(Category category);
-        Task<bool> UpdateCategoryAsync(Category category);
+        Task<IEnumerable<CategoryResponseDto>> GetAllCategoriesAsync();
+        Task<CategoryResponseDto?> GetCategoryByIdAsync(Guid id);
+        Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryDto dto);
+        Task<bool> UpdateCategoryAsync(Guid id, UpdateCategoryDto dto);
         Task<bool> DeleteCategoryAsync(Guid id);
         Task DeleteAllCategoriesAsync();
-        Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(Guid categoryId);
+        Task<IEnumerable<ProductResponseDto>> GetProductsByCategoryIdAsync(Guid categoryId);
     }
 }

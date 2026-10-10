@@ -1,4 +1,5 @@
 using LabProject.WebApi.Extentions;
+using LabProject.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureCors();
@@ -9,6 +10,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.ConfigureIISIntegration();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 
@@ -17,7 +19,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.UseExceptionHandler();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

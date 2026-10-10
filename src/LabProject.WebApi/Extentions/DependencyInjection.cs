@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using LabProject.Application.DTOs.Category;
 using LabProject.Application.Interfaces;
 using LabProject.Application.Services;
@@ -28,6 +29,7 @@ namespace LabProject.WebApi.Extentions
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddAutoMapper(cfg => cfg.AddMaps(typeof(UpdateCategoryDto).Assembly));
+            services.AddValidatorsFromAssemblyContaining<CreateCategoryDto>();
             return services;
         }
     }

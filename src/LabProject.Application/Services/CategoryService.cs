@@ -1,51 +1,90 @@
-﻿using LabProject.Application.Interfaces;
+﻿using AutoMapper;
+using FluentValidation;
+using LabProject.Application.DTOs.Category;
+using LabProject.Application.DTOs.Product;
+using LabProject.Application.Interfaces;
 using LabProject.Domain.Interfaces;
 using LabProject.Domain.Models;
 
-namespace LabProject.Application.Services
+namespace LabProject.Application.Services;
+
+public class CategoryService : ICategoryService
 {
-    public class CategoryService : ICategoryService
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IMapper _mapper;
+    private readonly IValidator<CreateCategoryDto> _createValidator;
+    private readonly IValidator<UpdateCategoryDto> _updateValidator;
+
+    public CategoryService(
+        ICategoryRepository categoryRepository,
+        IMapper mapper,
+        IValidator<CreateCategoryDto> createValidator,
+        IValidator<UpdateCategoryDto> updateValidator)
     {
-        private readonly ICategoryRepository _categoryRepository;
+        _categoryRepository = categoryRepository;
+        _mapper = mapper;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+    }
 
-        public CategoryService(ICategoryRepository categoryRepository)
+    public async Task<IEnumerable<CategoryResponseDto>> GetAllCategoriesAsync()
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<CategoryResponseDto>>(categories);
+    }
+
+    public async Task<CategoryResponseDto?> GetCategoryByIdAsync(Guid id)
+    {
+        var category = await _categoryRepository.GetByIdAsync(id);
+        return category is null ? null : _mapper.Map<CategoryResponseDto>(category);
+    }
+
+    public async Task<CategoryResponseDto> CreateCategoryAsync(CreateCategoryDto dto)
+    {
+        var validationResult = await _createValidator.ValidateAsync(dto);
+        if (!validationResult.IsValid)
         {
-            _categoryRepository = categoryRepository;
+            throw new ValidationException(validationResult.Errors);
         }
 
-        public Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        var category = _mapper.Map<Category>(dto);
+        category.Id = Guid.NewGuid();
+
+        var created = await _categoryRepository.AddAsync(category);
+        return _mapper.Map<CategoryResponseDto>(created);
+    }
+
+    public async Task<bool> UpdateCategoryAsync(Guid id, UpdateCategoryDto dto)
+    {
+        var validationResult = await _updateValidator.ValidateAsync(dto);
+        if (!validationResult.IsValid)
         {
-            return _categoryRepository.GetAllAsync();
+            throw new ValidationException(validationResult.Errors);
         }
 
-        public Task<Category?> GetCategoryByIdAsync(Guid id)
+        var existing = await _categoryRepository.GetByIdAsync(id);
+        if (existing is null)
         {
-            return _categoryRepository.GetByIdAsync(id);
+            return false;
         }
 
-        public Task<Category> CreateCategoryAsync(Category category)
-        {
-            return _categoryRepository.AddAsync(category);
-        }
+        _mapper.Map(dto, existing);
+        return await _categoryRepository.UpdateAsync(existing);
+    }
 
-        public Task<bool> UpdateCategoryAsync(Category category)
-        {
-            return _categoryRepository.UpdateAsync(category);
-        }
+    public async Task<bool> DeleteCategoryAsync(Guid id)
+    {
+        return await _categoryRepository.DeleteAsync(id);
+    }
 
-        public Task<bool> DeleteCategoryAsync(Guid id)
-        {
-            return _categoryRepository.DeleteAsync(id);
-        }
+    public async Task DeleteAllCategoriesAsync()
+    {
+        await _categoryRepository.DeleteAllAsync();
+    }
 
-        public Task DeleteAllCategoriesAsync()
-        {
-            return _categoryRepository.DeleteAllAsync();
-        }
-
-        public Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(Guid categoryId)
-        {
-            return _categoryRepository.GetProductsByCategoryIdAsync(categoryId);
-        }
+    public async Task<IEnumerable<ProductResponseDto>> GetProductsByCategoryIdAsync(Guid categoryId)
+    {
+        var products = await _categoryRepository.GetProductsByCategoryIdAsync(categoryId);
+        return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
     }
 }
