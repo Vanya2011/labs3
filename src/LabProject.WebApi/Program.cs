@@ -1,7 +1,10 @@
+using LabProject.Application.Configuration;
 using LabProject.WebApi.Extentions;
 using LabProject.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<PricingOptions>(
+    builder.Configuration.GetSection(PricingOptions.SectionName));
 builder.Services.ConfigureCors();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -10,6 +13,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.ConfigureIISIntegration();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "LabProject_";
+});
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 

@@ -14,14 +14,16 @@ namespace LabProject.WebApi.Middleware
         }
 
         public async ValueTask<bool> TryHandleAsync(
-            HttpContext httpContext,
-            Exception exception,
-            CancellationToken cancellationToken)
+    HttpContext httpContext,
+    Exception exception,
+    CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, $"unhandled error has occurred: {exception.Message}");
-
             if (exception is ValidationException validationException)
             {
+                _logger.LogWarning("Validation failed: {Message}. Errors count: {Count}",
+                    validationException.Message,
+                    validationException.Errors.Count());
+
                 httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 
                 var errors = validationException.Errors
@@ -34,19 +36,21 @@ namespace LabProject.WebApi.Middleware
                 var problemDetails = new ValidationProblemDetails(errors)
                 {
                     Status = StatusCodes.Status400BadRequest,
-                    Title = "request validation error",
-                    Detail = "one or more parameters failed the validation"
+                    Title = "Request validation error",
+                    Detail = "One or more parameters failed validation."
                 };
 
                 await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
                 return true;
             }
 
+            _logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
+
             httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
             var genericProblem = new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                Title = "server eror",
+                Title = "Server Error",
                 Detail = exception.Message
             };
 

@@ -6,7 +6,9 @@ namespace LabProject.Application.DTOs.Product
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public decimal Price { get; set; }
+        public decimal OriginalPrice { get; set; }
+        public decimal FinalPrice { get; set; }
+        public decimal AppliedDiscountPercentage { get; set; }
         public int StockQuantity { get; set; }
         public Guid CategoryId { get; set; }
         public string? CategoryName { get; set; }
