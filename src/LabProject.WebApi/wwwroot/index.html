@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="header__inner">
+                    <a class="header__logo" href="#">StoreAdmin</a>
+                    <div id="statusMessage" class="header__status"></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="main__catalog catalog">
+                <div class="container">
+                    <div class="catalog__heading heading">
+                        <p class="heading__subtitle">Lab 4 Client</p>
+                        <h2 class="heading__title">Store Management</h2>
+                    </div>
+
+                    <div class="catalog__inner">
+                        <div class="catalog__col">
+                            <div class="catalog__top">
+                                <h3 class="catalog__title">Categories</h3>
+                                <button type="button" id="btnDeleteAllCategories" class="catalog__btn-delete button">
+                                    Delete All
+                                </button>
+                            </div>
+
+                            <form id="categoryForm" class="catalog__form">
+                                <input type="hidden" id="categoryId">
+                                <div class="catalog__form-row">
+                                    <label class="catalog__form-label">
+                                        Category Name*
+                                        <input type="text" id="categoryName" class="catalog__form-input" placeholder="Electronics" required>
+                                    </label>
+                                </div>
+                                <div class="catalog__form-row">
+                                    <label class="catalog__form-label">
+                                        Description
+                                        <input type="text" id="categoryDescription" class="catalog__form-input" placeholder="Smartphones, gadgets...">
+                                    </label>
+                                </div>
+                                <div class="catalog__form-buttons">
+                                    <button type="submit" id="btnSaveCategory" class="catalog__form-btn button">Add Category</button>
+                                    <button type="button" id="btnCancelCategory" class="catalog__form-btn button button--empty catalog__btn--hidden">Cancel</button>
+                                </div>
+                            </form>
+
+                            <div class="catalog__table-box">
+                                <table class="catalog__table">
+                                    <thead class="catalog__table-head">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th class="catalog__table-actions-th">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="categoriesTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="catalog__col">
+                            <div class="catalog__top">
+                                <h3 class="catalog__title">Products</h3>
+                                <div class="catalog__top-actions">
+                                    <button type="button" id="btnResetProductFilter" class="catalog__btn-reset button button--empty catalog__btn--hidden">
+                                        Show All
+                                    </button>
+                                    <button type="button" id="btnDeleteAllProducts" class="catalog__btn-delete button">
+                                        Delete All
+                                    </button>
+                                </div>
+                            </div>
+
+                            <form id="productForm" class="catalog__form">
+                                <input type="hidden" id="productId">
+                                <div class="catalog__form-row">
+                                    <label class="catalog__form-label">
+                                        Product Name*
+                                        <input type="text" id="productName" class="catalog__form-input" placeholder="MacBook Pro" required>
+                                    </label>
+                                </div>
+                                <div class="catalog__form-row">
+                                    <label class="catalog__form-label catalog__form-label--half">
+                                        Price ($)*
+                                        <input type="number" step="0.01" id="productPrice" class="catalog__form-input" placeholder="999.99" required>
+                                    </label>
+                                    <label class="catalog__form-label catalog__form-label--half">
+                                        Stock*
+                                        <input type="number" id="productStock" class="catalog__form-input" placeholder="15" required>
+                                    </label>
+                                </div>
+                                <div class="catalog__form-row">
+                                    <label class="catalog__form-label">
+                                        Category*
+                                        <select id="productCategorySelect" class="catalog__form-input catalog__form-select" required></select>
+                                    </label>
+                                </div>
+                                <div class="catalog__form-buttons">
+                                    <button type="submit" id="btnSaveProduct" class="catalog__form-btn button">Add Product</button>
+                                    <button type="button" id="btnCancelProduct" class="catalog__form-btn button button--empty catalog__btn--hidden">Cancel</button>
+                                </div>
+                            </form>
+
+                            <div class="catalog__table-box">
+                                <table class="catalog__table">
+                                    <thead class="catalog__table-head">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Price</th>
+                                            <th>Stock</th>
+                                            <th class="catalog__table-actions-th">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
